@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ROSCASH 2.0: переход на Base и модель глобальной платформы</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --paper: #fffcf7;
+      --ink: #1c1915;
+      --muted: #5c574e;
+      --line: #e4ddd1;
+      --navy: #163247;
+      --navy-2: #1e4460;
+      --gold: #b8873a;
+      --gold-soft: #f4e6c8;
+      --green: #1f6b4a;
+      --green-bg: #e8f4ee;
+      --red-bg: #f8ece8;
+      --red: #8a3b2a;
+      --shadow: 0 10px 30px rgba(22, 50, 71, 0.08);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      font-size: 17px;
+    }
+    a { color: var(--navy-2); }
+    .hero {
+      background: linear-gradient(160deg, #102433 0%, #1c4a68 58%, #163247 100%);
+      color: #f7f3eb;
+      padding: 36px 20px 44px;
+    }
+    .wrap { width: min(860px, calc(100% - 32px)); margin: 0 auto; }
+    .eyebrow {
+      display: inline-block;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #e4c484;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: clamp(1.7rem, 5vw, 2.35rem); line-height: 1.2; font-weight: 700; max-width: 18ch; }
+    .lead { margin-top: 14px; color: #d9e3ea; max-width: 62ch; }
+    .meta { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px 18px; color: #c9d6de; font-size: 14px; }
+    nav.toc {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      margin: -28px auto 28px;
+      width: min(860px, calc(100% - 32px));
+    }
+    nav.toc strong { display: block; margin-bottom: 10px; color: var(--navy); }
+    nav.toc ol { margin-left: 20px; color: var(--muted); }
+    nav.toc a { text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    section {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 22px;
+      margin: 0 auto 20px;
+      width: min(860px, calc(100% - 32px));
+    }
+    h2 { font-size: 1.35rem; color: var(--navy); margin-bottom: 14px; line-height: 1.3; }
+    p { margin: 0 0 12px; color: var(--ink); }
+    .table-wrap { overflow-x: auto; margin: 8px 0 16px; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 560px; }
+    th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    th { background: #f3eee4; color: var(--navy); font-weight: 650; }
+    td.ok { color: var(--green); font-weight: 650; }
+    .flow {
+      display: grid;
+      gap: 8px;
+      margin: 8px 0 16px;
+    }
+    @media (min-width: 720px) {
+      .flow { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; }
+      .arrow { display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 700; }
+    }
+    .node {
+      background: #f8f4ec;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .node b { display: block; color: var(--navy); }
+    .node span { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+    .arrow { color: var(--gold); font-weight: 700; text-align: center; font-size: 13px; }
+    .split { display: grid; gap: 12px; margin-top: 8px; }
+    @media (min-width: 700px) { .split { grid-template-columns: 1fr 1fr; } }
+    .card { border-radius: 12px; padding: 14px 16px; }
+    .card h3 { font-size: 1rem; margin-bottom: 8px; }
+    .card ul { margin-left: 18px; }
+    .card li { margin: 0 0 8px; }
+    .pros { background: var(--green-bg); }
+    .pros h3 { color: var(--green); }
+    .cons { background: var(--red-bg); }
+    .cons h3 { color: var(--red); }
+    .calc { background: #f7f3eb; border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+    .caption { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+    .seg { margin-bottom: 12px; }
+    .seg p { font-size: 13px; font-weight: 650; color: var(--navy); margin-bottom: 8px; }
+    .seg-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .seg-row button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .seg-row button[aria-pressed="true"] {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+    .metrics { display: grid; gap: 10px; margin-top: 14px; }
+    @media (min-width: 640px) { .metrics { grid-template-columns: 1fr 1fr; } }
+    .metric { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+    .metric span { display: block; color: var(--muted); font-size: 13px; }
+    .metric strong { display: block; font-size: 1.45rem; margin-top: 4px; color: var(--navy); }
+    .metric.highlight { background: var(--green-bg); border-color: #cfe4d8; }
+    .metric.highlight strong { color: var(--green); }
+    .steps { counter-reset: step; list-style: none; }
+    .steps li {
+      position: relative;
+      padding: 0 0 18px 52px;
+      border-left: 2px solid var(--gold-soft);
+      margin-left: 16px;
+    }
+    .steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .steps li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: -16px;
+      top: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .steps b { display: block; color: var(--navy); margin-bottom: 4px; }
+    .callout {
+      background: #eaf2f7;
+      border-left: 4px solid var(--gold);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .callout strong { display: block; color: var(--navy); margin-bottom: 4px; }
+    .checks { list-style: none; }
+    .checks li { display: flex; gap: 10px; margin: 0 0 10px; }
+    .badge {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .done { background: var(--green); color: #fff; }
+    .todo { background: #ddd6c8; color: var(--navy); }
+    footer {
+      width: min(860px, calc(100% - 32px));
+      margin: 8px auto 40px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Стратегическая записка · конфиденциально для партнёров</div>
+      <h1>ROSCASH 2.0: переход на Base и модель глобальной платформы</h1>
+      <p class="lead">От централизованного учёта к некастодиальной фабрике смарт-контрактов на Base (USDC) для мировых ROSCA-сообществ. Документ для Михаила Гогия, директора и сооснователя ROSCASH.</p>
+      <div class="meta">
+        <span>20 ноября 2026</span>
+        <span>Текущая стадия: концепция после бета-теста</span>
+        <span>Старт проработки архитектуры: после 1 декабря, ориентир 3 декабря 2026</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Содержание">
+    <strong>Содержание</strong>
+    <ol>
+      <li><a href="#problem">Почему текущая модель упёрлась в потолок</a></li>
+      <li><a href="#base">Переход с Solana и учёта на Base (USDC)</a></li>
+      <li><a href="#platform">Платформа для всех ROSCA в мире</a></li>
+      <li><a href="#economics">Сценарный расчёт экономики (1% комиссии)</a></li>
+      <li><a href="#roadmap">План перехода после 1 декабря</a></li>
+      <li><a href="#status">Статус и следующие шаги</a></li>
+    </ol>
+  </nav>
+
+  <section id="problem">
+    <h2>Почему текущая модель упёрлась в потолок</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Параметр</th>
+            <th>Текущая модель (off-chain / Solana)</th>
+            <th>Почему это тормозит рост</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Аудитория</td>
+            <td>Незнакомые люди из интернета</td>
+            <td>Без личного знакомства нет социальной ответственности: при оплате по раундам мошенники забирают раннюю кассу и исчезают.</td>
+          </tr>
+          <tr>
+            <td>Эскроу и кредит</td>
+            <td>Полная предоплата цикла (100% escrow)</td>
+            <td>Участник сразу замораживает всю сумму цикла и теряет главный смысл круга — получить доступ к деньгам раньше.</td>
+          </tr>
+          <tr>
+            <td>Хранение средств</td>
+            <td>Баланс платформы и ручной вывод USDC</td>
+            <td>Компания берёт на себя риски хранения чужих средств, споры и барьер недоверия со стороны новых пользователей.</td>
+          </tr>
+          <tr>
+            <td>Смарт-контракты</td>
+            <td>Не запускались на Solana</td>
+            <td>Размещение программы на Solana требует заморозки около $300–400 в SOL и более дорогой разработки на Rust.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>В офлайне круги взаимного финансирования работают для более чем двух миллиардов человек именно потому, что участники знают друг друга и дорожат репутацией. Попытка сводить случайных анонимных пользователей в онлайне превращает сервис либо в ненужное 100% эскроу, либо в мишень для невозвратов.</p>
+  </section>
+
+  <section id="base">
+    <h2>Переход с Solana и централизованного учёта на Base (USDC)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Критерий</th>
+            <th>Solana / централизованный учёт</th>
+            <th>Base (смарт-контракты в USDC)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Стоимость запуска контракта</td>
+            <td>~$300–400 заморозки в SOL на программу</td>
+            <td class="ok">Центы или около $1 за деплой</td>
+          </tr>
+          <tr>
+            <td>Где лежат деньги круга</td>
+            <td>На кошельке платформы, учёт в базе</td>
+            <td class="ok">В открытом эскроу-контракте в сети</td>
+          </tr>
+          <tr>
+            <td>Валюта и инфраструктура</td>
+            <td>USDC, вывод вручную после одобрения</td>
+            <td>USDC на Base — стандарт Coinbase и EVM, выплаты по правилам контракта</td>
+          </tr>
+          <tr>
+            <td>Скорость разработки</td>
+            <td>Rust / Anchor, отдельная архитектура</td>
+            <td>Solidity и проверенный шаблон фабрики контрактов</td>
+          </tr>
+          <tr>
+            <td>Доверие пользователей</td>
+            <td>Нужно верить обещаниям компании</td>
+            <td class="ok">Код открыт и зафиксирован до старта круга: правила нельзя поменять задним числом</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Перенос расчётов в USDC на сеть Base решает сразу две задачи: убирает капитальные затраты на деплой в Solana и переводит деньги из ручного управления платформы в проверяемый смарт-контракт.</p>
+  </section>
+
+  <section id="platform">
+    <h2>Платформа для всех ROSCA в мире, а не закрытая касса</h2>
+    <p>Новая модель — это «Shopify» или фабрика контрактов для уже существующих сообществ: tanda, susu, arisan, chit, круги диаспор. Лидер приводит свою проверенную группу. Платформа не сводит незнакомцев и не держит чужие деньги на своём балансе. Комиссия протокола — около 1%, по той же логике, что и у фабрики пулов KredaFi.</p>
+    <div class="flow" aria-label="Схема работы платформы">
+      <div class="node"><b>Лидер или группа</b><span>tanda, susu, arisan, chit, диаспоры</span></div>
+      <div class="arrow">Запуск круга →</div>
+      <div class="node"><b>Фабрика ROSCASH (Base)</b><span>Создаёт контракт за минуту</span></div>
+      <div class="arrow">Изолированный эскроу →</div>
+      <div class="node"><b>Смарт-контракт круга</b><span>USDC взносы и выплаты</span></div>
+      <div class="arrow">Автоотчисление →</div>
+      <div class="node"><b>Комиссия протокола</b><span>~1% от оборота</span></div>
+    </div>
+    <div class="split">
+      <div class="card pros">
+        <h3>Что выигрывает ROSCASH</h3>
+        <ul>
+          <li>Организаторы готовых сообществ сами приводят участников и снимают проблему холодного старта и неплатежей между незнакомцами.</li>
+          <li>Платформа не хранит чужие деньги на своих счетах и не выступает стороной финансовых споров.</li>
+          <li>Модель масштабируется как нейтральная инфраструктура по всему миру, а не как локальный сервис.</li>
+          <li>Понятная монетизация протокола: около 1% с оборота или транзакций.</li>
+        </ul>
+      </div>
+      <div class="card cons">
+        <h3>Что нужно предусмотреть</h3>
+        <ul>
+          <li>Для обычных пользователей без криптокошелька нужен простой вход: встроенный кошелёк и понятная оплата комиссий сети.</li>
+          <li>Текущие активные off-chain круги нужно спокойно довести до завершения и не смешивать со стартом контрактов на Base.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="economics">
+    <h2>Сценарный расчёт экономики (целевая комиссия 1%)</h2>
+    <div class="calc">
+      <p class="caption">Иллюстративный сценарный калькулятор для обсуждения бизнес-модели. Цифры ниже — оценочный расчёт, а не фактические данные, не живые показатели платформы и не гарантированный прогноз.</p>
+      <div class="seg">
+        <p>Масштаб сети</p>
+        <div class="seg-row" id="scale-row" role="group" aria-label="Масштаб сети">
+          <button type="button" data-scale="50" aria-pressed="false">Пилот · 50 групп</button>
+          <button type="button" data-scale="500" aria-pressed="true">Рост · 500 групп</button>
+          <button type="button" data-scale="5000" aria-pressed="false">Сеть · 5 000 групп</button>
+        </div>
+      </div>
+      <div class="seg">
+        <p>Средний месячный пул одной группы</p>
+        <div class="seg-row" id="pool-row" role="group" aria-label="Размер пула">
+          <button type="button" data-pool="1000" aria-pressed="false">$1 000 / мес</button>
+          <button type="button" data-pool="2500" aria-pressed="true">$2 500 / мес</button>
+          <button type="button" data-pool="5000" aria-pressed="false">$5 000 / мес</button>
+        </div>
+      </div>
+      <p>Модель работает как фабрика: платформа зарабатывает процент от оборота кругов, которые создают сами организаторы, при нулевом кастоди на балансе компании.</p>
+      <div class="metrics">
+        <div class="metric">
+          <span>Месячный оборот кругов (оценка)</span>
+          <strong id="turnover">$1,250,000</strong>
+        </div>
+        <div class="metric highlight">
+          <span>Доход протокола при 1%</span>
+          <strong id="fee">$12,500 / мес</strong>
+        </div>
+        <div class="metric">
+          <span>Средств на балансе компании</span>
+          <strong>$0</strong>
+        </div>
+        <div class="metric">
+          <span>Ручных одобрений вывода</span>
+          <strong>0</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="roadmap">
+    <h2>План перехода после 1 декабря</h2>
+    <ol class="steps">
+      <li>
+        <b>Спокойно закрыть действующие off-chain круги</b>
+        Довести начатые циклы до конца и не смешивать старый учёт с новой контрактной архитектурой.
+      </li>
+      <li>
+        <b>Собрать фабрику контрактов ROSCA на Base</b>
+        Изолированный смарт-контракт под каждый круг «для своих» с расчётами в USDC и фиксированной долей протокола.
+      </li>
+      <li>
+        <b>Убрать сложность Web3 на входе</b>
+        Подключить встроенный кошелёк по почте или соцаккаунту и сценарий без ручной покупки газа.
+      </li>
+      <li>
+        <b>Выйти на мировые сообщества ROSCA</b>
+        Упаковать продукт под реальные рынки (Латинская Америка, Африка, Азия, диаспоры) и привлекать лидеров групп.
+      </li>
+    </ol>
+  </section>
+
+  <section id="status">
+    <h2>Статус и следующие шаги</h2>
+    <div class="callout">
+      <strong>Главный стратегический вывод</strong>
+      Вместо того чтобы тратить ресурсы на привлечение незнакомцев и брать на себя риски хранения денег, ROSCASH переходит в роль глобальной смарт-контрактной платформы на Base для тысяч уже существующих в мире кругов.
+    </div>
+    <ul class="checks">
+      <li><span class="badge done" aria-hidden="true">✓</span><span>Зафиксирована стратегия разворота в глобальную платформу кругов «для своих» на Base (по состоянию на 20 ноября 2026).</span></li>
+      <li><span class="badge done" aria-hidden="true">✓</span><span>Поставлен ориентир старта проработки архитектуры после запуска PEOPLE — 3 декабря 2026.</span></li>
+      <li><span class="badge todo" aria-hidden="true">○</span><span>Согласовать концепцию и ставку комиссии (~1%) с руководством и партнёром.</span></li>
+      <li><span class="badge todo" aria-hidden="true">○</span><span>Утвердить финальную спецификацию смарт-контракта круга и пользовательского входа без трения.</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    Документ подготовлен для внутреннего обсуждения основателей ROSCASH. Калькулятор носит иллюстративный характер и не является офертой, прогнозом доходности или обещанием финансовых результатов.
+  </footer>
+
+  <script>
+    (function () {
+      var scale = 500;
+      var pool = 2500;
+      var turnoverEl = document.getElementById("turnover");
+      var feeEl = document.getElementById("fee");
+
+      function formatUsd(amount) {
+        return "$" + amount.toLocaleString("en-US");
+      }
+
+      function render() {
+        var turnover = scale * pool;
+        var fee = Math.round(turnover * 0.01);
+        turnoverEl.textContent = formatUsd(turnover);
+        feeEl.textContent = formatUsd(fee) + " / мес";
+      }
+
+      function bind(rowId, attr, assign) {
+        var row = document.getElementById(rowId);
+        row.addEventListener("click", function (event) {
+          var btn = event.target.closest("button");
+          if (!btn) return;
+          assign(Number(btn.getAttribute(attr)));
+          row.querySelectorAll("button").forEach(function (b) {
+            b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+          });
+          render();
+        });
+      }
+
+      bind("scale-row", "data-scale", function (v) { scale = v; });
+      bind("pool-row", "data-pool", function (v) { pool = v; });
+      render();
+    })();
+  </script>
+</body>
+</html>
